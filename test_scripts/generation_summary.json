@@ -1,0 +1,261 @@
+{
+  "generation_metadata": {
+    "generated_at": "2025-01-15T12:30:00Z",
+    "generator": "Test_Script_Generator_GitHub",
+    "test_case_source": "test_case_analysis/test_case_analysis.json",
+    "mapping_source": "final_reports/final_graphify_report.json (NOT FOUND - used file_resolution_report.json only)",
+    "file_resolution_source": "file_resolution/file_resolution_report.json",
+    "storage_repo": "kramya1106/AAVA-PROJECT-1",
+    "total_test_cases_processed": 1,
+    "total_test_scripts_generated": 1,
+    "total_page_additions_generated": 3,
+    "total_helper_additions_generated": 1,
+    "total_new_page_objects_generated": 0,
+    "total_new_helpers_generated": 0,
+    "coverage_breakdown": {
+      "fully_covered_scripts": 0,
+      "partially_covered_scripts": 1,
+      "not_covered_scripts": 0
+    },
+    "write_results": {
+      "total_files_written": 5,
+      "successful_writes": 5,
+      "failed_writes": 0,
+      "failed_file_paths": []
+    }
+  },
+  "generated_files": {
+    "test_scripts": [
+      {
+        "test_case_id": "TC_LOGIN_001",
+        "test_case_title": "Verify user can login with valid credentials",
+        "module": "Authentication",
+        "coverage_status": "PARTIALLY_COVERED",
+        "resolution_status": "PARTIALLY_RESOLVED",
+        "github_file_path": "test_scripts/test_tc_login_001_verify_user_login.py",
+        "framework_target_path": "test_flows/TestTCLOGIN001VerifyUserLogin/test_tc_login_001_verify_user_login.py",
+        "function_name": "test_tc_login_001_verify_user_login",
+        "step_count": 10,
+        "preconditions_handled": 2,
+        "imports_used": {
+          "existing_page_objects": [
+            "HPIDPage",
+            "OverviewPage",
+            "DashboardSideMenuPage"
+          ],
+          "existing_helpers": [
+            "HPIDHelper",
+            "DashboardHelper"
+          ],
+          "new_page_additions_referenced": [
+            "hpid_page_additions.py",
+            "overview_page_additions.py",
+            "dashboard_side_menu_page_additions.py"
+          ],
+          "new_helpers_referenced": [
+            "dashboard_helper_additions.py"
+          ]
+        },
+        "write_status": "SUCCESS",
+        "generation_notes": "Test case TC_LOGIN_001 covers complete login-logout flow. File resolution report indicated PARTIALLY_RESOLVED status with 18 components needing creation. Core infrastructure (PlaywrightManager, BasePageObject, conftest fixtures) exists. Page objects (HPIDPage, OverviewPage, DashboardSideMenuPage) exist but lack specific locators for login form elements, dashboard elements, and logout functionality. Generated test script uses direct locator access pattern (page_obj.element_name) following AURA framework conventions. All 10 test steps mapped exactly as specified in test case analysis. HPIDHelper.sign_in exists but test uses manual credential entry for step-by-step validation. DashboardHelper.access exists but logout functionality was missing and added via helper additions. Test uses expect() assertions with explicit timeouts throughout. No time.sleep() used - all waits are Playwright-native. Username and password are constants at function top following framework pattern."
+      }
+    ],
+    "page_additions": [
+      {
+        "github_file_path": "additional_generations/page_additions/hpid_page_additions.py",
+        "target_page_file": "pages/hpid_page.py",
+        "target_class_name": "HPIDPage",
+        "reason": "File resolution report confirmed HPIDPage exists but KB does not document locators for login form elements (login_form, email_input, password_input, sign_in_button). Test steps 1-4 and 10 require these locators for navigation, credential entry, login button click, and login page verification after logout.",
+        "new_locators": [
+          {
+            "name": "login_form",
+            "selector": "form, .login-form, #loginForm",
+            "description": "Login form container for visibility verification"
+          },
+          {
+            "name": "email_input",
+            "selector": "[data-testid='email'], #username, #email, input[type='email']",
+            "description": "Email/username input field"
+          },
+          {
+            "name": "password_input",
+            "selector": "[data-testid='password'], #password, input[type='password']",
+            "description": "Password input field"
+          },
+          {
+            "name": "sign_in_button",
+            "selector": "[data-testid='sign-in-btn'], button:has-text('Sign In'), button:has-text('Login')",
+            "description": "Login/Sign-in submit button"
+          }
+        ],
+        "new_methods": [
+          {
+            "name": "navigate_to_login",
+            "description": "Navigate to the login page and wait for form to load"
+          },
+          {
+            "name": "enter_credentials",
+            "description": "Enter username and password credentials with clear and fill actions"
+          },
+          {
+            "name": "click_login_button",
+            "description": "Click login button and wait for navigation to dashboard"
+          },
+          {
+            "name": "verify_login_page_displayed",
+            "description": "Verify login page is displayed with form and input fields visible"
+          }
+        ],
+        "write_status": "SUCCESS"
+      },
+      {
+        "github_file_path": "additional_generations/page_additions/overview_page_additions.py",
+        "target_page_file": "pages/overview_page.py",
+        "target_class_name": "OverviewPage",
+        "reason": "File resolution report confirmed OverviewPage exists as GOD NODE but KB does not document locators for dashboard elements (dashboard_container, user_info_section, user_name_display). Test steps 5-6 require these locators for dashboard verification and user name display validation.",
+        "new_locators": [
+          {
+            "name": "dashboard_container",
+            "selector": "#dashboard, .dashboard-container, .main-content, [data-testid='dashboard']",
+            "description": "Dashboard main container for visibility verification"
+          },
+          {
+            "name": "user_info_section",
+            "selector": ".user-info, #userProfile, .user-section, [data-testid='user-info']",
+            "description": "User information section on dashboard"
+          },
+          {
+            "name": "user_name_display",
+            "selector": ".username, .user-name, #userName, [data-testid='user-name']",
+            "description": "User name display element showing logged-in user"
+          }
+        ],
+        "new_methods": [
+          {
+            "name": "verify_dashboard_displayed",
+            "description": "Verify dashboard page is displayed by checking URL, container, and user info"
+          },
+          {
+            "name": "get_user_name_text",
+            "description": "Retrieve the displayed user name text from dashboard"
+          }
+        ],
+        "write_status": "SUCCESS"
+      },
+      {
+        "github_file_path": "additional_generations/page_additions/dashboard_side_menu_page_additions.py",
+        "target_page_file": "pages/dashboard_side_menu_page.py",
+        "target_class_name": "DashboardSideMenuPage",
+        "reason": "File resolution report confirmed DashboardSideMenuPage exists with billing_shipping_link but KB does not document locators for navigation_menu, menu_items, or logout_button. Test steps 7-9 require these locators for navigation menu verification and logout functionality.",
+        "new_locators": [
+          {
+            "name": "navigation_menu",
+            "selector": "nav, .navbar, .navigation, #mainNav, [data-testid='navigation']",
+            "description": "Navigation menu container"
+          },
+          {
+            "name": "menu_items",
+            "selector": "nav ul li, .menu-items li, .nav-items li, [data-testid='menu-item']",
+            "description": "Navigation menu items list"
+          },
+          {
+            "name": "logout_button",
+            "selector": "button:has-text('Logout'), button:has-text('Sign Out'), a:has-text('Logout'), [data-testid='logout-btn']",
+            "description": "Logout button (may be in dropdown)"
+          }
+        ],
+        "new_methods": [
+          {
+            "name": "verify_navigation_menu_visible",
+            "description": "Verify navigation menu is visible with menu items present"
+          },
+          {
+            "name": "click_logout_button",
+            "description": "Click logout button with dropdown handling and wait for navigation"
+          }
+        ],
+        "write_status": "SUCCESS"
+      }
+    ],
+    "helper_additions": [
+      {
+        "github_file_path": "additional_generations/helper_additions/dashboard_helper_additions.py",
+        "target_helper_file": "helper/dashboard_helper.py",
+        "target_class_name": "DashboardHelper",
+        "reason": "File resolution report confirmed DashboardHelper exists with access, first_access, sees_status_card methods but KB does not document any logout functionality. Test step 9 requires logout action. Added logout() static method following AURA helper pattern with page as first parameter.",
+        "new_methods": [
+          {
+            "name": "logout",
+            "description": "Perform logout action from dashboard - clicks logout button, waits for navigation, verifies login page"
+          },
+          {
+            "name": "verify_user_logged_in",
+            "description": "Verify user is logged in by checking dashboard elements and optional username match"
+          }
+        ],
+        "write_status": "SUCCESS"
+      }
+    ],
+    "new_page_objects": [],
+    "new_helpers": []
+  },
+  "generation_summary": {
+    "test_scripts_by_coverage": {
+      "fully_covered": [],
+      "partially_covered": [
+        "TC_LOGIN_001"
+      ],
+      "not_covered": []
+    },
+    "all_existing_imports_used": [
+      "from core.playwright_manager import PlaywrightManager",
+      "from core.settings import framework_logger",
+      "from helper.hpid_helper import HPIDHelper",
+      "from helper.dashboard_helper import DashboardHelper",
+      "from pages.hpid_page import HPIDPage",
+      "from pages.overview_page import OverviewPage",
+      "from pages.dashboard_side_menu_page import DashboardSideMenuPage",
+      "from playwright.sync_api import expect",
+      "import test_flows_common.test_flows_common as common"
+    ],
+    "all_new_files_created_in_repo": [
+      "test_scripts/test_tc_login_001_verify_user_login.py",
+      "additional_generations/page_additions/hpid_page_additions.py",
+      "additional_generations/page_additions/overview_page_additions.py",
+      "additional_generations/page_additions/dashboard_side_menu_page_additions.py",
+      "additional_generations/helper_additions/dashboard_helper_additions.py"
+    ],
+    "all_existing_files_to_update_in_framework": [
+      "pages/hpid_page.py (merge hpid_page_additions.py)",
+      "pages/overview_page.py (merge overview_page_additions.py)",
+      "pages/dashboard_side_menu_page.py (merge dashboard_side_menu_page_additions.py)",
+      "helper/dashboard_helper.py (merge dashboard_helper_additions.py)"
+    ],
+    "integration_instructions": [
+      "1. Clone the AAVA-PROJECT-1 repository from kramya1106/AAVA-PROJECT-1",
+      "2. For the test script in test_scripts/:",
+      "   a. Create folder test_flows/TestTCLOGIN001VerifyUserLogin/ in AURA-FRAMEWORK",
+      "   b. Copy test_tc_login_001_verify_user_login.py into that folder",
+      "3. For page additions in additional_generations/page_additions/:",
+      "   a. Open pages/hpid_page.py in AURA-FRAMEWORK",
+      "   b. Add the 4 new locators to the __init__ method: login_form, email_input, password_input, sign_in_button",
+      "   c. Add the 4 new methods to the class body: navigate_to_login, enter_credentials, click_login_button, verify_login_page_displayed",
+      "   d. Open pages/overview_page.py in AURA-FRAMEWORK",
+      "   e. Add the 3 new locators to the __init__ method: dashboard_container, user_info_section, user_name_display",
+      "   f. Add the 2 new methods to the class body: verify_dashboard_displayed, get_user_name_text",
+      "   g. Open pages/dashboard_side_menu_page.py in AURA-FRAMEWORK",
+      "   h. Add the 3 new locators to the __init__ method: navigation_menu, menu_items, logout_button",
+      "   i. Add the 2 new methods to the class body: verify_navigation_menu_visible, click_logout_button",
+      "4. For helper additions in additional_generations/helper_additions/:",
+      "   a. Open helper/dashboard_helper.py in AURA-FRAMEWORK",
+      "   b. Add the 2 new static methods to the DashboardHelper class: logout, verify_user_logged_in",
+      "5. Update test data:",
+      "   a. Replace USERNAME constant 'testuser@example.com' with actual valid test user email",
+      "   b. Replace PASSWORD constant 'Test@12345' with actual valid test user password",
+      "   c. Or use common.generate_tenant_email() and common.DEFAULT_PASSWORD if creating new user",
+      "6. Run the test:",
+      "   pytest test_flows/TestTCLOGIN001VerifyUserLogin/test_tc_login_001_verify_user_login.py -v",
+      "7. Verify all 10 steps execute successfully with screenshots captured at checkpoints"
+    ]
+  }
+}
