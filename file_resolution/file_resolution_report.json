@@ -1,28 +1,202 @@
 {
   "meta": {
     "resolution_version": "1.0",
-    "resolved_at": "2025-01-15T12:00:00Z",
+    "resolved_at": "2025-01-15T10:45:00Z",
     "source_analysis_file": "test_case_analysis/test_case_analysis.json",
+    "resolver_agent": "Senior Test-to-Codebase File Resolution Specialist",
     "knowledge_base_used": "lwa_graphify_kb_kr_new_15_05_2026_new",
     "total_test_cases_resolved": 1,
     "total_files_identified": 12,
     "total_components_to_create": 18,
-    "resolution_methodology": "KB-driven query and verification"
+    "framework_coverage_percentage": 40
   },
-  "test_cases": [
+  "test_case_resolutions": [
     {
       "test_case_id": "TC_LOGIN_001",
       "title": "Verify user can login with valid credentials",
       "module": "Authentication",
       "resolution_status": "PARTIALLY_RESOLVED",
-      "resolution_summary": "Core infrastructure and base classes exist in framework. Login page object (pages/hpid_page.py) exists but lacks specific locators for standard login form. Dashboard helper exists but logout functionality is not documented. Significant components need creation for complete login-logout flow automation.",
+      "resolution_summary": "This login test case requires significant new component creation. The AURA framework does not have a dedicated standalone login page object or login helper. Authentication is handled through HPIDHelper which focuses on HP ID account creation (sign-up) and sign-in during enrollment flows, not standalone login testing. The test requires creating new page objects for login page and dashboard verification, new locators for login form elements and dashboard elements, and new methods for login operations and logout functionality. The framework provides foundation infrastructure (browser management, base page objects, test setup) but lacks the specific login testing components.",
       "relevant_files": [
+        {
+          "file_path": "pages/base_page_object.py",
+          "class_name": "BasePageObject",
+          "category": "infrastructure",
+          "relevant_methods": [
+            "wait_for_element_visible",
+            "wait_for_element_clickable",
+            "get_element_text",
+            "click_element",
+            "type_text",
+            "clear_field"
+          ],
+          "reason": "Base class for all page objects. Provides common page interaction methods including waits, element interactions, and navigation helpers. Required because any page object (LoginPage, DashboardPage) must inherit from BasePageObject.",
+          "import_statement": "from pages.base_page_object import BasePageObject",
+          "community": "4, 19",
+          "relevant_to_steps": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "dependencies": []
+        },
+        {
+          "file_path": "pages/hpid_page.py",
+          "class_name": "HPIDPage",
+          "category": "page_object",
+          "relevant_methods": [],
+          "reason": "HP ID authentication page object. Contains locators for email, password, and sign-in button elements. While this is primarily for HP ID account creation (sign-up), it may contain some sign-in form elements that could be referenced for the login test. However, KB confirms this is NOT a dedicated login page - it handles HP ID flows during enrollment.",
+          "import_statement": "from pages.hpid_page import HPIDPage",
+          "community": "0, 1",
+          "relevant_to_steps": [
+            2,
+            3,
+            4
+          ],
+          "dependencies": [
+            "pages/base_page_object.py"
+          ]
+        },
+        {
+          "file_path": "helper/hpid_helper.py",
+          "class_name": "HPIDHelper",
+          "category": "helper",
+          "relevant_methods": [
+            "sign_in",
+            "sign_up",
+            "confirm_account_code"
+          ],
+          "reason": "HP ID authentication helper. Provides sign_in(page, email, password) method for existing user authentication and sign_up for new account creation. This is the closest existing component to login functionality, though it's designed for HP ID flows during enrollment rather than standalone login testing.",
+          "import_statement": "from helper.hpid_helper import HPIDHelper",
+          "community": "0, 1",
+          "relevant_to_steps": [
+            2,
+            3,
+            4
+          ],
+          "dependencies": [
+            "pages/hpid_page.py"
+          ]
+        },
+        {
+          "file_path": "pages/overview_page.py",
+          "class_name": "OverviewPage",
+          "category": "page_object",
+          "relevant_methods": [],
+          "reason": "Dashboard/Overview page object. This is the main dashboard page users see after successful login/enrollment. Contains locators for status cards, plan details, and navigation elements. Needed for verifying successful login by checking dashboard page is displayed. KB confirms this is a GOD NODE with 160 edges indicating high connectivity.",
+          "import_statement": "from pages.overview_page import OverviewPage",
+          "community": "1",
+          "relevant_to_steps": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "dependencies": [
+            "pages/base_page_object.py"
+          ]
+        },
+        {
+          "file_path": "pages/dashboard_side_menu_page.py",
+          "class_name": "DashboardSideMenuPage",
+          "category": "page_object",
+          "relevant_methods": [
+            "click_update_plan"
+          ],
+          "reason": "Dashboard side navigation menu page object. Contains navigation links for dashboard sections. May contain locators for navigation menu items and potentially logout button. Needed for verifying navigation menu is displayed after login.",
+          "import_statement": "from pages.dashboard_side_menu_page import DashboardSideMenuPage",
+          "community": "19",
+          "relevant_to_steps": [
+            7,
+            8,
+            9
+          ],
+          "dependencies": [
+            "pages/base_page_object.py"
+          ]
+        },
+        {
+          "file_path": "pages/privacy_banner_page.py",
+          "class_name": "PrivacyBannerPage",
+          "category": "page_object",
+          "relevant_methods": [
+            "accept_privacy_banner",
+            "accept_all_cookies"
+          ],
+          "reason": "Privacy banner/cookie consent page object. May appear before or after login. Provides methods to accept privacy banner and cookies. Needed to handle potential privacy consent popup during login flow.",
+          "import_statement": "from pages.privacy_banner_page import PrivacyBannerPage",
+          "community": "0, 1",
+          "relevant_to_steps": [
+            1,
+            4
+          ],
+          "dependencies": [
+            "pages/base_page_object.py"
+          ]
+        },
+        {
+          "file_path": "helper/dashboard_helper.py",
+          "class_name": "DashboardHelper",
+          "category": "helper",
+          "relevant_methods": [
+            "access",
+            "first_access",
+            "skip_preconditions"
+          ],
+          "reason": "Dashboard access and navigation helper. Provides methods for navigating to dashboard and handling first-time access. May be useful for post-login dashboard verification. However, KB does not confirm logout methods exist in this helper.",
+          "import_statement": "from helper.dashboard_helper import DashboardHelper",
+          "community": "4",
+          "relevant_to_steps": [
+            4,
+            5
+          ],
+          "dependencies": [
+            "pages/overview_page.py",
+            "pages/privacy_banner_page.py",
+            "pages/dashboard_side_menu_page.py",
+            "helper/hpid_helper.py"
+          ]
+        },
+        {
+          "file_path": "test_flows_common/test_flows_common.py",
+          "class_name": "test_flows_common",
+          "category": "foundation",
+          "relevant_methods": [
+            "setup",
+            "generate_tenant_email",
+            "create_hpid",
+            "fetch_verification_code",
+            "extract_verification_code",
+            "take_screenshot"
+          ],
+          "reason": "Foundation test utilities module. Provides test setup, email generation for test accounts, HPID account creation, and screenshot utilities. Required for test initialization and test data generation. Note: This is a MODULE not a class.",
+          "import_statement": "import test_flows_common.test_flows_common as common",
+          "community": "0, 34",
+          "relevant_to_steps": [
+            1,
+            2,
+            6
+          ],
+          "dependencies": []
+        },
         {
           "file_path": "core/playwright_manager.py",
           "class_name": "PlaywrightManager",
           "category": "infrastructure",
-          "relevant_methods": [],
-          "reason": "Browser lifecycle management - required for every test to initialize and manage browser instances",
+          "relevant_methods": [
+            "create_browser",
+            "create_page",
+            "close_browser"
+          ],
+          "reason": "Browser lifecycle management. Creates and manages browser instances and page objects. Required for all tests to initialize browser and page for test execution.",
           "import_statement": "from core.playwright_manager import PlaywrightManager",
           "community": "2",
           "relevant_to_steps": [
@@ -36,26 +210,32 @@
             8,
             9,
             10
-          ]
+          ],
+          "dependencies": []
         },
         {
           "file_path": "core/settings.py",
           "class_name": "Settings",
           "category": "infrastructure",
           "relevant_methods": [],
-          "reason": "Configuration management for base URLs, timeouts, and environment settings",
+          "reason": "Configuration management. Provides environment settings, base URLs, timeouts, and test configuration. Required for accessing application URL and environment-specific settings.",
           "import_statement": "from core.settings import Settings",
-          "community": "unknown",
+          "community": "2, 4",
           "relevant_to_steps": [
             1
-          ]
+          ],
+          "dependencies": []
         },
         {
           "file_path": "core/allure_reporter.py",
           "class_name": "AllureReporter",
           "category": "infrastructure",
-          "relevant_methods": [],
-          "reason": "Test reporting and validation - session-scoped fixture for capturing test results",
+          "relevant_methods": [
+            "attach_screenshot",
+            "add_step",
+            "report_assertion"
+          ],
+          "reason": "Test reporting and validation mechanism. Handles Allure report generation, screenshot attachments, and test result capture. Required for test reporting and validation tracking.",
           "import_statement": "from core.allure_reporter import AllureReporter",
           "community": "10",
           "relevant_to_steps": [
@@ -69,18 +249,16 @@
             8,
             9,
             10
-          ]
+          ],
+          "dependencies": []
         },
         {
           "file_path": "conftest.py",
           "class_name": "N/A",
           "category": "infrastructure",
-          "relevant_methods": [
-            "pytest_addoption",
-            "pytest_runtest_makereport"
-          ],
-          "reason": "Pytest configuration with fixtures: stage_callback, tc_tracer, main_execution, reporter, session_cleanup",
-          "import_statement": "N/A - pytest auto-discovers",
+          "relevant_methods": [],
+          "reason": "Pytest configuration and fixtures. Provides essential fixtures including reporter(), main_execution(), session_cleanup(), and test hooks. Required for pytest test execution framework.",
+          "import_statement": "N/A - pytest auto-discovers conftest.py",
           "community": "10",
           "relevant_to_steps": [
             1,
@@ -93,189 +271,70 @@
             8,
             9,
             10
-          ]
-        },
-        {
-          "file_path": "core/conftest.py",
-          "class_name": "N/A",
-          "category": "infrastructure",
-          "relevant_methods": [
-            "load_yaml_file",
-            "parse_flow",
-            "extract_flow_steps"
           ],
-          "reason": "YAML test configuration loading - provides yaml_data, testcase_id fixtures",
-          "import_statement": "N/A - pytest auto-discovers",
-          "community": "10",
-          "relevant_to_steps": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10
-          ]
-        },
-        {
-          "file_path": "pages/base_page_object.py",
-          "class_name": "BasePageObject",
-          "category": "foundation",
-          "relevant_methods": [
-            "wait_for_element_visible",
-            "wait_for_element_not_visible",
-            "assert_element_visible",
-            "assert_element_not_visible",
-            "enter_text"
-          ],
-          "reason": "Base class for all page objects - provides common page interaction methods. Required when any page object is included.",
-          "import_statement": "from pages.base_page_object import BasePageObject",
-          "community": "unknown",
-          "relevant_to_steps": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10
-          ]
-        },
-        {
-          "file_path": "pages/hpid_page.py",
-          "class_name": "HPIDPage",
-          "category": "page_object",
-          "relevant_methods": [],
-          "reason": "HP ID authentication page - handles login/sign-in form elements. This is the actual login page in AURA framework (not 'LoginPage').",
-          "import_statement": "from pages.hpid_page import HPIDPage",
-          "community": "0, 1",
-          "relevant_to_steps": [
-            1,
-            2,
-            3,
-            4
-          ]
-        },
-        {
-          "file_path": "pages/overview_page.py",
-          "class_name": "OverviewPage",
-          "category": "page_object",
-          "relevant_methods": [],
-          "reason": "Dashboard overview page - landing page after successful login. GOD NODE with 160 edges. Handles dashboard elements.",
-          "import_statement": "from pages.overview_page import OverviewPage",
-          "community": "1",
-          "relevant_to_steps": [
-            4,
-            5,
-            6,
-            7,
-            8,
-            9
-          ]
-        },
-        {
-          "file_path": "pages/dashboard_side_menu_page.py",
-          "class_name": "DashboardSideMenuPage",
-          "category": "page_object",
-          "relevant_methods": [],
-          "reason": "Dashboard navigation menu - handles side menu elements including navigation links. Referenced in framework but locators not fully documented in KB.",
-          "import_statement": "from pages.dashboard_side_menu_page import DashboardSideMenuPage",
-          "community": "19",
-          "relevant_to_steps": [
-            7,
-            8,
-            9
-          ]
-        },
-        {
-          "file_path": "helper/hpid_helper.py",
-          "class_name": "HPIDHelper",
-          "category": "helper",
-          "relevant_methods": [
-            "sign_in",
-            "sign_up",
-            "confirm_account_code"
-          ],
-          "reason": "HP ID authentication helper - orchestrates sign-in flow. KB confirms sign_in(page, email, password) method exists.",
-          "import_statement": "from helper.hpid_helper import HPIDHelper",
-          "community": "0, 1",
-          "relevant_to_steps": [
-            2,
-            3,
-            4
-          ]
-        },
-        {
-          "file_path": "helper/dashboard_helper.py",
-          "class_name": "DashboardHelper",
-          "category": "helper",
-          "relevant_methods": [
-            "access",
-            "first_access",
-            "accept_banner_and_access_overview_page",
-            "sees_status_card",
-            "skips_preconditions"
-          ],
-          "reason": "Dashboard access orchestration - handles navigation to dashboard with authentication. KB confirms access(page, tenant_email) and sees_status_card(page) methods exist.",
-          "import_statement": "from helper.dashboard_helper import DashboardHelper",
-          "community": "4",
-          "relevant_to_steps": [
-            4,
-            5,
-            6,
-            7
-          ]
-        },
-        {
-          "file_path": "test_flows_common/test_flows_common.py",
-          "class_name": "TestFlowsCommon",
-          "category": "foundation",
-          "relevant_methods": [
-            "take_screenshot",
-            "wait_for_page_to_load",
-            "click_element",
-            "get_control_value"
-          ],
-          "reason": "Common test utilities - setup, email generation, account creation, screenshot capture, wait utilities. Required foundation file.",
-          "import_statement": "from test_flows_common.test_flows_common import TestFlowsCommon",
-          "community": "0, 34",
-          "relevant_to_steps": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10
-          ]
+          "dependencies": []
         }
       ],
       "relevant_locators_summary": {
-        "pages/hpid_page.py": {
-          "confirmed_locators": [],
-          "note": "KB does not confirm specific locators for standard login form (username_input, password_input, login_button). HPIDPage exists but its locators are not documented in KB chunks provided."
-        },
-        "pages/overview_page.py": {
-          "confirmed_locators": [],
-          "note": "KB confirms OverviewPage exists as GOD NODE but does not document specific locators for user_name_display, navigation_menu, or dashboard elements."
-        },
-        "pages/dashboard_side_menu_page.py": {
-          "confirmed_locators": [
-            "billing_shipping_link"
-          ],
-          "note": "KB confirms billing_shipping_link exists. Other navigation menu locators not documented."
-        }
+        "pages/hpid_page.py": [
+          {
+            "locator_name": "email_input",
+            "locator_type": "text_input",
+            "usage": "Enter username/email for login",
+            "kb_confirmed": false,
+            "note": "KB does not provide complete locator list for hpid_page.py. Locator existence needs verification."
+          },
+          {
+            "locator_name": "password_input",
+            "locator_type": "password_input",
+            "usage": "Enter password for login",
+            "kb_confirmed": false,
+            "note": "KB does not provide complete locator list for hpid_page.py. Locator existence needs verification."
+          },
+          {
+            "locator_name": "sign_in_button",
+            "locator_type": "button",
+            "usage": "Submit login credentials",
+            "kb_confirmed": false,
+            "note": "KB does not provide complete locator list for hpid_page.py. Locator existence needs verification."
+          }
+        ],
+        "pages/overview_page.py": [
+          {
+            "locator_name": "status_cards",
+            "locator_type": "container",
+            "usage": "Dashboard status cards for verification",
+            "kb_confirmed": false,
+            "note": "KB mentions status cards exist but does not provide actual locator definitions."
+          },
+          {
+            "locator_name": "plan_details",
+            "locator_type": "section",
+            "usage": "Plan information display",
+            "kb_confirmed": false,
+            "note": "KB mentions plan details exist but does not provide actual locator definitions."
+          }
+        ],
+        "pages/dashboard_side_menu_page.py": [
+          {
+            "locator_name": "billing_shipping_link",
+            "locator_type": "link",
+            "usage": "Navigation link for billing/shipping section",
+            "kb_confirmed": true,
+            "note": "KB confirms this locator exists in dashboard_side_menu_page.py"
+          }
+        ],
+        "pages/privacy_banner_page.py": [
+          {
+            "locator_name": "accept_button",
+            "locator_type": "button",
+            "usage": "Accept privacy banner/cookies",
+            "kb_confirmed": false,
+            "note": "KB confirms accept_privacy_banner() method exists but does not detail locators."
+          }
+        ]
       },
-      "flow_pattern": "Navigate to application URL → Load login page (HPIDPage) → Enter username in email field → Enter password → Click login button → Navigate to dashboard (OverviewPage) → Verify dashboard displayed → Verify user name displayed → Verify navigation menu visible → Verify logout button visible → Click logout button → Verify redirected to login page",
+      "flow_pattern": "Navigate to Login Page → Enter Username → Enter Password → Click Login Button → Verify Dashboard Displayed → Verify User Info → Verify Navigation Menu → Verify Logout Button → Click Logout → Verify Redirected to Login Page",
       "communities_involved": [
         "0",
         "1",
@@ -287,292 +346,352 @@
       ],
       "components_to_create": [
         {
-          "type": "locator",
-          "name": "email_input",
-          "suggested_file": "pages/hpid_page.py",
-          "description": "Email/username input field locator on login page. Likely selector: [data-testid='email'] or #username or #email",
-          "reason": "KB does not confirm this locator exists in HPIDPage. Test step 2 requires entering username in email field.",
+          "type": "page_object",
+          "name": "LoginPage",
+          "suggested_file": "pages/login_page.py",
+          "description": "Dedicated page object for standalone login page with locators for login form elements (username field, password field, login button, login form container, error message display) and methods for login interactions. The AURA framework does not have a dedicated login page object - authentication is handled through HPIDPage which is designed for HP ID account creation during enrollment, not standalone login testing.",
+          "reason": "KB confirms no dedicated LoginPage exists. HPIDPage handles HP ID flows during enrollment, not standalone login. Test case requires a dedicated login page object for login testing.",
+          "kb_confirmation": "KB query confirmed: 'The AURA framework does NOT have a dedicated LoginPage page object file. Login functionality is handled by pages/hpid_page.py with the HPIDPage class, which manages HP ID authentication (sign-in/sign-up).'",
           "relevant_to_steps": [
-            2
-          ]
-        },
-        {
-          "type": "locator",
-          "name": "password_input",
-          "suggested_file": "pages/hpid_page.py",
-          "description": "Password input field locator on login page. Likely selector: [type='password'] or #password",
-          "reason": "KB does not confirm this locator exists in HPIDPage. Test step 3 requires entering password.",
-          "relevant_to_steps": [
-            3
-          ]
-        },
-        {
-          "type": "locator",
-          "name": "sign_in_button",
-          "suggested_file": "pages/hpid_page.py",
-          "description": "Login/Sign-in submit button locator. Likely selector: [data-testid='sign-in-btn'] or button with text 'Login' or 'Sign In'",
-          "reason": "KB does not confirm this locator exists in HPIDPage. Test step 4 requires clicking login button.",
-          "relevant_to_steps": [
+            1,
+            2,
+            3,
             4
-          ]
+          ],
+          "priority": "critical"
         },
         {
           "type": "locator",
           "name": "login_form",
-          "suggested_file": "pages/hpid_page.py",
-          "description": "Login form container locator for visibility verification. Likely selector: form or .login-form or #loginForm",
-          "reason": "KB does not confirm this locator exists. Test steps 1 and 10 require verifying login form is visible.",
+          "suggested_file": "pages/login_page.py",
+          "description": "Locator for the login form container element. Used to verify login page is displayed and login form is visible.",
+          "reason": "Test step 1 requires verifying login form is visible. No existing page object has this locator for standalone login page.",
+          "kb_confirmation": "KB does not document a login_form locator in any existing page object.",
           "relevant_to_steps": [
             1,
             10
-          ]
+          ],
+          "priority": "critical"
         },
         {
-          "type": "method",
-          "name": "navigate_to_login",
-          "suggested_file": "pages/hpid_page.py",
-          "description": "Method to navigate directly to login page URL. Should use base_url from settings and navigate to login path.",
-          "reason": "KB does not confirm this method exists in HPIDPage. Test step 1 requires navigating to login page.",
-          "relevant_to_steps": [
-            1
-          ]
-        },
-        {
-          "type": "method",
-          "name": "enter_credentials",
-          "suggested_file": "pages/hpid_page.py",
-          "description": "Method to enter username and password. Parameters: (email: string, password: string). Should clear fields, type values, and verify entry.",
-          "reason": "KB does not confirm this method exists. Test steps 2-3 require entering credentials. Could use existing enter_text from BasePageObject but need wrapper method.",
+          "type": "locator",
+          "name": "username_input",
+          "suggested_file": "pages/login_page.py",
+          "description": "Locator for username/email input field on login page. Used to enter username credentials.",
+          "reason": "Test step 2 requires entering username. While HPIDPage may have email_input, KB does not confirm its existence or suitability for standalone login testing.",
+          "kb_confirmation": "KB does not provide complete locator list for hpid_page.py. Locator existence needs verification.",
           "relevant_to_steps": [
             2,
+            10
+          ],
+          "priority": "critical"
+        },
+        {
+          "type": "locator",
+          "name": "password_input",
+          "suggested_file": "pages/login_page.py",
+          "description": "Locator for password input field on login page. Used to enter password credentials.",
+          "reason": "Test step 3 requires entering password. While HPIDPage may have password_input, KB does not confirm its existence or suitability for standalone login testing.",
+          "kb_confirmation": "KB does not provide complete locator list for hpid_page.py. Locator existence needs verification.",
+          "relevant_to_steps": [
+            3,
+            10
+          ],
+          "priority": "critical"
+        },
+        {
+          "type": "locator",
+          "name": "login_button",
+          "suggested_file": "pages/login_page.py",
+          "description": "Locator for login submit button. Used to submit login credentials.",
+          "reason": "Test step 4 requires clicking login button. While HPIDPage may have sign_in_button, KB does not confirm its existence or suitability for standalone login testing.",
+          "kb_confirmation": "KB does not provide complete locator list for hpid_page.py. Locator existence needs verification.",
+          "relevant_to_steps": [
+            4
+          ],
+          "priority": "critical"
+        },
+        {
+          "type": "method",
+          "name": "navigate_to_login_page",
+          "suggested_file": "pages/login_page.py",
+          "description": "Method to navigate to the application login page using base URL from configuration. Should handle page load wait and verify login page is displayed.",
+          "reason": "Test step 1 requires navigating to login page. No existing helper or page object method provides standalone login page navigation.",
+          "kb_confirmation": "KB does not document a navigate_to_login_page method in any existing file.",
+          "relevant_to_steps": [
+            1
+          ],
+          "priority": "critical"
+        },
+        {
+          "type": "method",
+          "name": "enter_username",
+          "suggested_file": "pages/login_page.py",
+          "description": "Method to clear and type username into username input field. Should include wait for element to be visible and enabled.",
+          "reason": "Test step 2 requires entering username. No existing page object method provides this for standalone login page.",
+          "kb_confirmation": "KB does not document an enter_username method in any existing page object.",
+          "relevant_to_steps": [
+            2
+          ],
+          "priority": "critical"
+        },
+        {
+          "type": "method",
+          "name": "enter_password",
+          "suggested_file": "pages/login_page.py",
+          "description": "Method to clear and type password into password input field. Should include wait for element to be visible and enabled.",
+          "reason": "Test step 3 requires entering password. No existing page object method provides this for standalone login page.",
+          "kb_confirmation": "KB does not document an enter_password method in any existing page object.",
+          "relevant_to_steps": [
             3
-          ]
+          ],
+          "priority": "critical"
         },
         {
           "type": "method",
           "name": "click_login_button",
-          "suggested_file": "pages/hpid_page.py",
-          "description": "Method to click login/sign-in button and wait for navigation. Should wait for URL change and dashboard page load.",
-          "reason": "KB does not confirm this method exists. Test step 4 requires clicking login button with navigation handling.",
+          "suggested_file": "pages/login_page.py",
+          "description": "Method to click login submit button and wait for navigation to complete. Should handle authentication process wait and page transition.",
+          "reason": "Test step 4 requires clicking login button. No existing page object method provides this for standalone login page.",
+          "kb_confirmation": "KB does not document a click_login_button method in any existing page object.",
           "relevant_to_steps": [
             4
-          ]
+          ],
+          "priority": "critical"
         },
         {
           "type": "method",
-          "name": "verify_login_page_displayed",
-          "suggested_file": "pages/hpid_page.py",
-          "description": "Assertion method to verify login page is displayed with login form visible. Should check URL, page title, and form presence.",
-          "reason": "KB does not confirm this method exists. Test steps 1 and 10 require verifying login page is displayed.",
+          "name": "perform_login",
+          "suggested_file": "pages/login_page.py",
+          "description": "Composite method that performs complete login flow: navigate to login page, enter username, enter password, click login button, wait for dashboard navigation. High-level wrapper for login operations.",
+          "reason": "Test steps 1-4 represent a complete login flow. A composite method would simplify test script and provide reusable login functionality.",
+          "kb_confirmation": "KB does not document a perform_login composite method in any existing file.",
           "relevant_to_steps": [
             1,
-            10
-          ]
-        },
-        {
-          "type": "locator",
-          "name": "user_name_display",
-          "suggested_file": "pages/overview_page.py",
-          "description": "User name display element locator on dashboard. Likely selector: .username or .user-name or #userName or [data-testid='user-name']",
-          "reason": "KB does not confirm this locator exists in OverviewPage. Test step 6 requires verifying user name is displayed.",
-          "relevant_to_steps": [
-            6
-          ]
-        },
-        {
-          "type": "locator",
-          "name": "navigation_menu",
-          "suggested_file": "pages/dashboard_side_menu_page.py",
-          "description": "Navigation menu container locator. Likely selector: nav or .navbar or .navigation or #mainNav",
-          "reason": "KB does not confirm this locator exists in DashboardSideMenuPage. Test step 7 requires verifying navigation menu is visible.",
-          "relevant_to_steps": [
-            7
-          ]
-        },
-        {
-          "type": "locator",
-          "name": "logout_button",
-          "suggested_file": "pages/dashboard_side_menu_page.py",
-          "description": "Logout button locator. Likely selector: button with text 'Logout' or 'Sign Out' or [data-testid='logout-btn']",
-          "reason": "KB does not confirm this locator exists in any dashboard page. Test steps 8-9 require logout button interaction.",
-          "relevant_to_steps": [
-            8,
-            9
-          ]
+            2,
+            3,
+            4
+          ],
+          "priority": "high"
         },
         {
           "type": "locator",
           "name": "dashboard_container",
           "suggested_file": "pages/overview_page.py",
-          "description": "Dashboard main container locator for visibility verification. Likely selector: #dashboard or .dashboard-container or .main-content",
-          "reason": "KB does not confirm this locator exists. Test step 5 requires verifying dashboard container is visible.",
+          "description": "Locator for main dashboard container element. Used to verify dashboard page is displayed after successful login.",
+          "reason": "Test step 5 requires verifying dashboard container is visible. KB mentions overview_page.py exists but does not provide actual locator definitions.",
+          "kb_confirmation": "KB does not provide complete locator list for overview_page.py. Locator existence needs verification.",
           "relevant_to_steps": [
             5
-          ]
+          ],
+          "priority": "critical"
         },
         {
           "type": "locator",
           "name": "user_info_section",
           "suggested_file": "pages/overview_page.py",
-          "description": "User information section locator. Likely selector: .user-info or #userProfile or .user-section",
-          "reason": "KB does not confirm this locator exists. Test step 5 requires verifying user info section is displayed.",
+          "description": "Locator for user information section on dashboard. Used to verify user information is displayed after login.",
+          "reason": "Test step 5 requires verifying user info section is visible. KB does not provide locator definitions for overview_page.py.",
+          "kb_confirmation": "KB does not provide complete locator list for overview_page.py. Locator existence needs verification.",
           "relevant_to_steps": [
             5
-          ]
+          ],
+          "priority": "critical"
+        },
+        {
+          "type": "locator",
+          "name": "user_name_display",
+          "suggested_file": "pages/overview_page.py",
+          "description": "Locator for user name display element on dashboard. Used to get and verify the displayed username matches logged-in user.",
+          "reason": "Test step 6 requires verifying user name is displayed and matches expected value. KB does not provide locator definitions for overview_page.py.",
+          "kb_confirmation": "KB does not provide complete locator list for overview_page.py. Locator existence needs verification.",
+          "relevant_to_steps": [
+            6
+          ],
+          "priority": "critical"
+        },
+        {
+          "type": "locator",
+          "name": "navigation_menu",
+          "suggested_file": "pages/overview_page.py or pages/dashboard_side_menu_page.py",
+          "description": "Locator for main navigation menu container. Used to verify navigation menu is displayed on dashboard.",
+          "reason": "Test step 7 requires verifying navigation menu is visible. KB does not confirm which page object contains this locator or if it exists.",
+          "kb_confirmation": "KB does not provide complete locator list for overview_page.py or dashboard_side_menu_page.py navigation menu container.",
+          "relevant_to_steps": [
+            7
+          ],
+          "priority": "high"
+        },
+        {
+          "type": "locator",
+          "name": "logout_button",
+          "suggested_file": "pages/overview_page.py or pages/dashboard_side_menu_page.py",
+          "description": "Locator for logout button. Used to verify logout button is visible and to click it for logout operation.",
+          "reason": "Test steps 8 and 9 require verifying logout button is visible and clicking it. KB does not document any logout button locator in any page object.",
+          "kb_confirmation": "KB query confirmed: 'I cannot find any explicit documentation of logout functionality in the AURA framework.' No logout button locator exists.",
+          "relevant_to_steps": [
+            8,
+            9
+          ],
+          "priority": "critical"
         },
         {
           "type": "method",
-          "name": "verify_dashboard_displayed",
+          "name": "click_logout_button",
+          "suggested_file": "pages/overview_page.py or helper/dashboard_helper.py",
+          "description": "Method to click logout button and wait for logout process to complete and navigation to login page. Should handle session termination and page transition.",
+          "reason": "Test step 9 requires clicking logout button. KB confirms no logout method exists in any helper or page object.",
+          "kb_confirmation": "KB query confirmed: 'I cannot find any explicit documentation of logout functionality in the AURA framework.' No logout method exists.",
+          "relevant_to_steps": [
+            9
+          ],
+          "priority": "critical"
+        },
+        {
+          "type": "method",
+          "name": "verify_dashboard_page_visible",
           "suggested_file": "pages/overview_page.py",
-          "description": "Assertion method to verify dashboard page is displayed. Should check URL contains /dashboard or /home, page title, and dashboard container visibility.",
-          "reason": "KB does not confirm this method exists. Test step 5 requires verifying dashboard is displayed after login.",
+          "description": "Method to verify dashboard page is displayed by checking page title, URL, and key dashboard elements are visible.",
+          "reason": "Test step 5 requires verifying dashboard page is visible. No existing method provides comprehensive dashboard verification.",
+          "kb_confirmation": "KB does not document a verify_dashboard_page_visible method in overview_page.py.",
           "relevant_to_steps": [
             5
-          ]
+          ],
+          "priority": "high"
         },
         {
           "type": "method",
           "name": "get_user_name_text",
           "suggested_file": "pages/overview_page.py",
-          "description": "Method to retrieve displayed user name text. Returns string. Should wait for element visible then get text content.",
-          "reason": "KB does not confirm this method exists. Test step 6 requires getting user name text for verification.",
+          "description": "Method to get the text displayed in the user name element on dashboard. Returns the username string for verification.",
+          "reason": "Test step 6 requires getting user name text to verify it matches expected value. No existing method provides this functionality.",
+          "kb_confirmation": "KB does not document a get_user_name_text method in overview_page.py.",
           "relevant_to_steps": [
             6
-          ]
-        },
-        {
-          "type": "method",
-          "name": "verify_navigation_menu_visible",
-          "suggested_file": "pages/dashboard_side_menu_page.py",
-          "description": "Assertion method to verify navigation menu is visible with all menu items present.",
-          "reason": "KB does not confirm this method exists. Test step 7 requires verifying navigation menu visibility.",
-          "relevant_to_steps": [
-            7
-          ]
-        },
-        {
-          "type": "method",
-          "name": "logout",
-          "suggested_file": "helper/dashboard_helper.py",
-          "description": "Method to perform logout action. Should click logout button, wait for navigation to login page, and verify logout success. Parameters: (page). No logout method documented in KB.",
-          "reason": "KB does not document any logout functionality in DashboardHelper or any page object. Test step 9 requires logout action.",
-          "relevant_to_steps": [
-            9
-          ]
-        },
-        {
-          "type": "method",
-          "name": "click_logout_button",
-          "suggested_file": "pages/dashboard_side_menu_page.py",
-          "description": "Method to click logout button and wait for navigation. Should handle potential dropdown menu if logout is nested.",
-          "reason": "KB does not confirm this method exists. Test step 9 requires clicking logout button.",
-          "relevant_to_steps": [
-            9
-          ]
+          ],
+          "priority": "high"
         }
       ],
       "execution_order": [
         {
           "order": 1,
-          "component": "PlaywrightManager - initialize browser",
-          "file": "core/playwright_manager.py",
-          "status": "EXISTS"
+          "component": "pages/login_page.py → navigate_to_login_page()",
+          "status": "TO_CREATE",
+          "description": "Navigate to application login page using base URL from settings"
         },
         {
           "order": 2,
-          "component": "HPIDPage.navigate_to_login()",
-          "file": "pages/hpid_page.py",
-          "status": "TO_CREATE"
+          "component": "pages/login_page.py → enter_username(username)",
+          "status": "TO_CREATE",
+          "description": "Enter valid username into username input field"
         },
         {
           "order": 3,
-          "component": "HPIDPage.verify_login_page_displayed()",
-          "file": "pages/hpid_page.py",
-          "status": "TO_CREATE"
+          "component": "pages/login_page.py → enter_password(password)",
+          "status": "TO_CREATE",
+          "description": "Enter valid password into password input field"
         },
         {
           "order": 4,
-          "component": "HPIDPage.enter_credentials(username, password) OR HPIDHelper.sign_in(page, email, password)",
-          "file": "pages/hpid_page.py OR helper/hpid_helper.py",
-          "status": "PARTIAL - HPIDHelper.sign_in EXISTS but page-level method TO_CREATE"
+          "component": "pages/login_page.py → click_login_button()",
+          "status": "TO_CREATE",
+          "description": "Click login button to submit credentials and authenticate"
         },
         {
           "order": 5,
-          "component": "Wait for navigation to dashboard",
-          "file": "pages/base_page_object.py",
-          "status": "EXISTS - use wait_for_element_visible"
+          "component": "pages/overview_page.py → verify_dashboard_page_visible()",
+          "status": "TO_CREATE",
+          "description": "Verify dashboard page is displayed after successful login"
         },
         {
           "order": 6,
-          "component": "OverviewPage.verify_dashboard_displayed()",
-          "file": "pages/overview_page.py",
-          "status": "TO_CREATE"
+          "component": "pages/overview_page.py → get_user_name_text()",
+          "status": "TO_CREATE",
+          "description": "Get displayed username and verify it matches logged-in user"
         },
         {
           "order": 7,
-          "component": "DashboardHelper.sees_status_card(page)",
-          "file": "helper/dashboard_helper.py",
-          "status": "EXISTS"
+          "component": "pages/overview_page.py or pages/dashboard_side_menu_page.py → verify navigation menu visible",
+          "status": "TO_CREATE",
+          "description": "Verify navigation menu is displayed on dashboard"
         },
         {
           "order": 8,
-          "component": "OverviewPage.get_user_name_text() and verify",
-          "file": "pages/overview_page.py",
-          "status": "TO_CREATE"
+          "component": "pages/overview_page.py → verify logout button visible",
+          "status": "TO_CREATE",
+          "description": "Verify logout button is displayed and accessible"
         },
         {
           "order": 9,
-          "component": "DashboardSideMenuPage.verify_navigation_menu_visible()",
-          "file": "pages/dashboard_side_menu_page.py",
-          "status": "TO_CREATE"
+          "component": "pages/overview_page.py → click_logout_button()",
+          "status": "TO_CREATE",
+          "description": "Click logout button to log out and navigate to login page"
         },
         {
           "order": 10,
-          "component": "DashboardSideMenuPage.click_logout_button() OR DashboardHelper.logout(page)",
-          "file": "pages/dashboard_side_menu_page.py OR helper/dashboard_helper.py",
-          "status": "TO_CREATE"
-        },
-        {
-          "order": 11,
-          "component": "Wait for navigation to login page",
-          "file": "pages/base_page_object.py",
-          "status": "EXISTS - use wait_for_element_visible"
-        },
-        {
-          "order": 12,
-          "component": "HPIDPage.verify_login_page_displayed()",
-          "file": "pages/hpid_page.py",
-          "status": "TO_CREATE"
+          "component": "pages/login_page.py → verify login page displayed",
+          "status": "TO_CREATE",
+          "description": "Verify user is redirected to login page after logout"
         }
       ],
-      "dependency_notes": {
-        "critical_dependencies": [
-          "pages/hpid_page.py depends on pages/base_page_object.py (parent class)",
-          "pages/overview_page.py depends on pages/base_page_object.py (parent class)",
-          "pages/dashboard_side_menu_page.py depends on pages/base_page_object.py (parent class)",
-          "helper/hpid_helper.py depends on pages/hpid_page.py",
-          "helper/dashboard_helper.py depends on pages/overview_page.py, pages/privacy_banner_page.py, pages/dashboard_side_menu_page.py"
+      "missing_coverage_analysis": {
+        "core_subject_steps": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
         ],
-        "missing_dependencies": [
-          "pages/privacy_banner_page.py - not included but may be needed if privacy banner appears after login"
-        ]
+        "steps_with_no_kb_confirmed_coverage": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "coverage_percentage": 0,
+        "explanation": "The AURA framework does not have components specifically designed for standalone login testing. All 10 test steps require new component creation. The framework's authentication is built around HP ID account creation during enrollment flows (HPIDHelper, HPIDPage) rather than standalone login/logout testing. While foundation infrastructure exists (browser management, base page objects, test setup), the specific login testing components (LoginPage, login methods, logout functionality, dashboard verification methods) do not exist and must be created."
       },
-      "kb_verification_summary": {
-        "files_confirmed_by_kb": 12,
-        "methods_confirmed_by_kb": 8,
-        "locators_confirmed_by_kb": 1,
-        "components_flagged_as_missing": 18,
-        "kb_queries_performed": 15
+      "dependency_notes": "All page objects depend on pages/base_page_object.py. DashboardHelper depends on overview_page.py, privacy_banner_page.py, dashboard_side_menu_page.py, and hpid_helper.py. HPIDHelper depends on hpid_page.py. Test execution requires foundation files: test_flows_common, playwright_manager, settings, allure_reporter, conftest.py.",
+      "navigation_chain": "Login Page → Dashboard/Overview Page → Login Page (after logout)",
+      "test_data_requirements": {
+        "username": {
+          "source": "test_data_file or test_flows_common.generate_tenant_email()",
+          "type": "string",
+          "sample": "testuser@example.com"
+        },
+        "password": {
+          "source": "test_data_file or configuration",
+          "type": "string",
+          "sample": "Test@12345",
+          "sensitive": true
+        },
+        "application_base_url": {
+          "source": "core/settings.py",
+          "type": "url",
+          "sample": "https://app.example.com/login"
+        }
       }
     }
   ],
-  "global_notes": {
-    "framework_name": "AURA",
-    "framework_pattern": "Page Object Model with Helper orchestration layer",
-    "authentication_approach": "AURA uses HPIDPage (not LoginPage) for authentication. HPIDHelper orchestrates sign-in flow. DashboardHelper handles post-login dashboard access.",
-    "logout_gap": "No logout functionality documented in KB. This is a significant gap requiring component creation.",
-    "locator_verification_status": "KB does not provide detailed locator listings for HPIDPage or OverviewPage. Locators must be created based on actual application inspection.",
-    "test_case_complexity": "Medium - standard login-logout flow but requires significant component creation due to KB documentation gaps.",
-    "token_reduction_estimate": "85% - resolved to 12 files from 85 total framework files"
+  "summary": {
+    "total_test_cases": 1,
+    "fully_resolved": 0,
+    "partially_resolved": 1,
+    "unresolved": 0,
+    "total_files_identified": 12,
+    "total_components_to_create": 18,
+    "framework_readiness": "LOW - Significant component creation required for login testing",
+    "recommendation": "The AURA framework is designed for HP Instant Ink enrollment and subscription management testing, not standalone login/logout testing. To automate this login test case, you must create: (1) A dedicated LoginPage page object with login form locators and methods, (2) Logout functionality (locator and method) in dashboard page objects, (3) Dashboard verification methods in OverviewPage for user info and navigation menu validation. Consider whether this test case aligns with the framework's intended use case (enrollment flows) or if it should be adapted to test login as part of an enrollment scenario where existing HPIDHelper.sign_in() could be leveraged."
   }
 }
